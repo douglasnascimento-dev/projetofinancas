@@ -9,7 +9,7 @@
     "start": "node src/server.js",
     "db:reset": "node database/reset.js",
     "seed": "node database/seed.js",
-    "test": "node --test src/models/regras/"
+    "test": "node --test \"src/models/regras/*.test.js\""
   },
   "engines": {
     "node": ">=20"
