@@ -1,0 +1,18 @@
+# dependências e builds
+node_modules/
+dist/
+
+# variáveis de ambiente (nunca versionar)
+.env
+.env.local
+
+# documentos de planejamento e identidade visual (ficam só na máquina)
+*.md
+!README.md
+brand/
+.impeccable/
+
+# sistema
+.DS_Store
+Thumbs.db
+*.log
