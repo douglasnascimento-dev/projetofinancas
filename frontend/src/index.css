@@ -1,0 +1,97 @@
+/* coIN — tokens de design (iguais às variáveis do Figma) e estilos base */
+:root {
+  --bg-app: #F5F6F8;
+  --bg-surface: #FFFFFF;
+  --bg-subtle: #EEF1F5;
+  --bg-brand-subtle: #E9EEF8;
+  --border: #E3E6EB;
+  --border-strong: #C9CED6;
+  --text: #0F172A;
+  --text-secondary: #475467;
+  --text-muted: #6B7280;
+  --text-on-brand: #FFFFFF;
+  --brand: #1A3A8F;
+  --brand-hover: #132C6E;
+  --income: #15803D;
+  --income-subtle: #E8F5EC;
+  --expense: #C2261C;
+  --expense-subtle: #FCEBEA;
+  --warning: #B45309;
+  --chart-1: #1A3A8F; --chart-2: #0EA5E9; --chart-3: #14B8A6;
+  --chart-4: #F59E0B; --chart-5: #EF6C4A; --chart-6: #94A3B8;
+
+  --space-4: 4px; --space-8: 8px; --space-12: 12px; --space-16: 16px;
+  --space-20: 20px; --space-24: 24px; --space-32: 32px; --space-40: 40px;
+  --radius-sm: 6px; --radius-md: 8px; --radius-lg: 12px; --radius-full: 999px;
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.06);
+  --shadow-drawer: -8px 0 32px rgba(15, 23, 42, 0.16);
+  --font: 'Manrope', system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body, #root { min-height: 100%; }
+body {
+  margin: 0;
+  background: var(--bg-app);
+  color: var(--text);
+  font: 400 14px/20px var(--font);
+  -webkit-font-smoothing: antialiased;
+}
+h1, h2, h3, p { margin: 0; }
+a { color: var(--brand); text-decoration: none; font-weight: 500; }
+a:hover { text-decoration: underline; }
+button, input, select { font: inherit; color: inherit; }
+:focus-visible { outline: 2px solid var(--brand); outline-offset: 2px; }
+
+/* Tipografia (estilos de texto do Figma) */
+.h1 { font-size: 24px; line-height: 32px; font-weight: 600; letter-spacing: -0.2px; }
+.h2 { font-size: 16px; line-height: 24px; font-weight: 600; }
+.texto-mutado { color: var(--text-muted); }
+.texto-secundario { color: var(--text-secondary); }
+.pequeno { font-size: 13px; line-height: 18px; }
+.legenda { font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.2px; }
+.dinheiro { font-variant-numeric: tabular-nums; font-weight: 600; }
+.entrada { color: var(--income); }
+.saida { color: var(--expense); }
+
+/* Botões */
+.botao {
+  display: inline-flex; align-items: center; justify-content: center; gap: var(--space-8);
+  padding: 10px 16px; border-radius: var(--radius-md); border: 1px solid transparent;
+  font-weight: 500; cursor: pointer; white-space: nowrap; transition: background 0.15s;
+}
+.botao:disabled { opacity: 0.6; cursor: not-allowed; }
+.botao-primario { background: var(--brand); color: var(--text-on-brand); }
+.botao-primario:hover:not(:disabled) { background: var(--brand-hover); }
+.botao-secundario { background: var(--bg-surface); border-color: var(--border-strong); }
+.botao-secundario:hover:not(:disabled) { background: var(--bg-subtle); }
+.botao-perigo { background: var(--expense); color: var(--text-on-brand); }
+.botao-bloco { width: 100%; padding: 12px 16px; }
+
+/* Campos */
+.campo { display: flex; flex-direction: column; gap: 6px; }
+.campo label { font-size: 12px; line-height: 16px; font-weight: 500; letter-spacing: 0.2px; color: var(--text-secondary); }
+.campo-caixa {
+  display: flex; align-items: center; gap: var(--space-8);
+  background: var(--bg-surface); border: 1px solid var(--border-strong); border-radius: var(--radius-md);
+  padding: 0 12px;
+}
+.campo-caixa:focus-within { border-color: var(--brand); box-shadow: 0 0 0 3px var(--bg-brand-subtle); }
+.campo-caixa input, .campo-caixa select { flex: 1; border: 0; outline: 0; background: transparent; padding: 10px 0; min-width: 0; }
+.campo-acao { border: 0; background: none; color: var(--text-muted); cursor: pointer; padding: 0; }
+.campo-erro .campo-caixa { border-color: var(--expense); box-shadow: 0 0 0 1px var(--expense); }
+.campo-ajuda { font-size: 13px; line-height: 18px; color: var(--text-muted); }
+.campo-erro .campo-ajuda { color: var(--expense); }
+
+/* Cartões, alertas, selos */
+.card {
+  background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card); padding: var(--space-24);
+}
+.alerta { border-radius: var(--radius-md); padding: 12px 14px; display: flex; flex-direction: column; gap: 2px; }
+.alerta-erro { background: var(--expense-subtle); }
+.alerta-erro strong { color: var(--expense); font-weight: 500; }
+.selo { display: inline-block; padding: 2px 8px; border-radius: var(--radius-full); font-size: 12px; line-height: 16px; font-weight: 500; }
+
+/* Estados */
+.tela-carregando { min-height: 100vh; display: grid; place-items: center; color: var(--text-muted); }
