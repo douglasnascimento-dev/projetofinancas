@@ -4,6 +4,7 @@
 import { randomUUID } from 'node:crypto';
 import bcrypt from 'bcrypt';
 import { pool, transacao } from '../src/config/db.js';
+import { dividirEmParcelas } from '../src/models/regras/parcelas.js';
 
 const SENHA_DEMO = 'senha1234';
 
@@ -12,13 +13,6 @@ const CATEGORIAS = [
   ['Alimentação', 'saida'], ['Moradia', 'saida'], ['Saúde', 'saida'], ['Mobilidade', 'saida'],
   ['Lazer', 'saida'], ['Educação', 'saida'], ['Outros', 'saida'],
 ];
-
-// Divide um valor em N parcelas trabalhando em centavos; a sobra vai para a 1ª parcela.
-function dividir(valor, n) {
-  const centavos = Math.round(valor * 100);
-  const base = Math.floor(centavos / n);
-  return Array.from({ length: n }, (_, i) => (i === 0 ? base + (centavos - base * n) : base) / 100);
-}
 
 async function criarUsuario(cliente, { nome, email, cpf }) {
   const senhaHash = await bcrypt.hash(SENHA_DEMO, 10);
@@ -50,7 +44,7 @@ async function criarFonte(cliente, usuarioId, nome, tipo, extra = {}) {
 
 async function lancar(cliente, usuarioId, { tipo, descricao, valor, data, categoriaId, fonteId, parcelas = 1 }) {
   const grupo = parcelas > 1 ? randomUUID() : null;
-  const valores = dividir(valor, parcelas);
+  const valores = dividirEmParcelas(valor, parcelas);
   for (let i = 0; i < parcelas; i++) {
     await cliente.query(
       `INSERT INTO lancamentos
