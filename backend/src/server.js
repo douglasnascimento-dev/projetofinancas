@@ -4,6 +4,10 @@ import express from 'express';
 import cors from 'cors';
 import 'dotenv/config';
 import authRoutes from './routes/auth.routes.js';
+import categoriasRoutes from './routes/categorias.routes.js';
+import fontesDestinosRoutes from './routes/fontesDestinos.routes.js';
+import lancamentosRoutes from './routes/lancamentos.routes.js';
+import { autenticar } from './middlewares/autenticar.js';
 import { rotaNaoEncontrada, tratarErros } from './middlewares/tratarErros.js';
 
 const app = express();
@@ -17,6 +21,11 @@ app.use(express.json({ limit: '100kb' }));
 // Rotas da API
 app.get('/api', (req, res) => res.json({ api: 'coIN', status: 'ok' }));
 app.use('/api/auth', authRoutes);
+
+// Daqui para baixo, todas as rotas exigem token
+app.use('/api/categorias', autenticar, categoriasRoutes);
+app.use('/api/fontes-destinos', autenticar, fontesDestinosRoutes);
+app.use('/api/lancamentos', autenticar, lancamentosRoutes);
 
 // 404 e tratamento de erros centralizado (sempre por último)
 app.use(rotaNaoEncontrada);
