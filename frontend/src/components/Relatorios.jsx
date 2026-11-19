@@ -1,5 +1,5 @@
 // src/components/Relatorios.jsx
-// Relatórios do período: por categoria (RF7). Os totais vêm calculados da API.
+// Relatórios do período: por categoria (RF7) e por fonte/destino (RF8). Os totais vêm calculados da API.
 import { useState } from 'react';
 import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { api } from '../services/api';
@@ -28,15 +28,19 @@ export function Variacao({ valor }) {
 }
 
 export function Relatorios() {
+  const [aba, setAba] = useState('categorias');
   const [periodo, setPeriodo] = useState(periodoDoMes(hoje().slice(0, 7)));
   const periodoValido = periodo.inicio && periodo.fim && periodo.inicio <= periodo.fim;
 
   const consulta = new URLSearchParams(periodo).toString();
   const relatorio = useBuscar(
-    (signal) => (periodoValido ? api.get(`/relatorios/categorias?${consulta}`, { signal }) : Promise.resolve(null)),
-    [consulta],
+    (signal) => (periodoValido ? api.get(`/relatorios/${aba}?${consulta}`, { signal }) : Promise.resolve(null)),
+    [aba, consulta],
   );
-  const r = relatorio.dados;
+  // Ao trocar de aba, ignora os dados da aba anterior até a nova resposta chegar
+  const r = relatorio.dados && (aba === 'categorias' ? 'categorias' in relatorio.dados : 'contas' in relatorio.dados)
+    ? relatorio.dados : null;
+  const anterior = r?.periodoAnterior;
 
   return (
     <>
@@ -44,7 +48,9 @@ export function Relatorios() {
         <div>
           <h1 className="h1">Relatórios</h1>
           <p className="texto-mutado">
-            {r ? `${rotuloPeriodo(r.periodo)} comparado com ${rotuloPeriodo(r.periodoAnterior).toLowerCase()}` : 'Escolha o período'}
+            {!r ? 'Escolha o período' : anterior
+              ? `${rotuloPeriodo(r.periodo)} comparado com ${rotuloPeriodo(anterior).toLowerCase()}`
+              : rotuloPeriodo(r.periodo)}
           </p>
         </div>
         <div className="cabecalho-acoes">
@@ -54,9 +60,16 @@ export function Relatorios() {
         </div>
       </div>
 
+      <div className="abas" role="tablist" aria-label="Tipo de relatório">
+        {[['categorias', 'Por categoria'], ['fontes-destinos', 'Por fonte/destino']].map(([valor, rotulo]) => (
+          <button key={valor} type="button" role="tab" aria-selected={aba === valor}
+            className={aba === valor ? 'ativa' : ''} onClick={() => setAba(valor)}>{rotulo}</button>
+        ))}
+      </div>
+
       {relatorio.erro ? <div className="card"><ErroCarregar erro={relatorio.erro} aoTentarDeNovo={relatorio.recarregar} /></div>
         : relatorio.carregando && !r ? <div className="card"><Carregando linhas={6} /></div>
-          : r && <RelatorioCategorias r={r} />}
+          : r && (aba === 'categorias' ? <RelatorioCategorias r={r} /> : <RelatorioFontesDestinos r={r} />)}
     </>
   );
 }
@@ -142,6 +155,77 @@ function RelatorioCategorias({ r }) {
           </div>
         </section>
       )}
+    </>
+  );
+}
+
+// Barras horizontais simples (entradas por fonte / saídas por destino)
+function BarrasHorizontais({ itens, cor }) {
+  return (
+    <div style={{ width: '100%', height: Math.max(120, itens.length * 40) }}>
+      <ResponsiveContainer>
+        <BarChart data={itens} layout="vertical" margin={{ left: 8, right: 16 }}>
+          <XAxis type="number" hide />
+          <YAxis type="category" dataKey="nome" width={130} tickLine={false} axisLine={false} />
+          <Tooltip formatter={(v) => moeda(v)} cursor={{ fill: '#EEF1F5' }} />
+          <Bar dataKey="total" name="Total" fill={cor} radius={[0, 4, 4, 0]} barSize={10} />
+        </BarChart>
+      </ResponsiveContainer>
+    </div>
+  );
+}
+
+function RelatorioFontesDestinos({ r }) {
+  if (r.fontes.length === 0 && r.destinos.length === 0) {
+    return <div className="card"><Vazio titulo="Nenhum lançamento no período" texto="Escolha outro período ou registre lançamentos para ver os relatórios." /></div>;
+  }
+  const sinal = (v) => `${v < 0 ? '− ' : '+ '}${moeda(Math.abs(v))}`;
+
+  return (
+    <>
+      <div className="duas-colunas" style={{ marginBottom: 16 }}>
+        <section className="card">
+          <div className="card-cabecalho">
+            <h2 className="h2">Entradas por fonte</h2>
+            <span className="selo selo-entrada">{moeda(r.totalEntradas)}</span>
+          </div>
+          {r.fontes.length === 0 ? <Vazio titulo="Nenhuma entrada no período" /> : <BarrasHorizontais itens={r.fontes} cor="#15803D" />}
+        </section>
+        <section className="card">
+          <div className="card-cabecalho">
+            <h2 className="h2">Saídas por destino</h2>
+            <span className="selo selo-saida">{moeda(r.totalSaidas)}</span>
+          </div>
+          {r.destinos.length === 0 ? <Vazio titulo="Nenhuma saída no período" /> : <BarrasHorizontais itens={r.destinos} cor={COR_ATUAL} />}
+        </section>
+      </div>
+
+      <section className="card">
+        <div className="card-cabecalho"><h2 className="h2">Saldo das contas no período</h2></div>
+        {r.contas.length === 0 ? <Vazio titulo="Nenhuma conta cadastrada" texto="Cadastre uma fonte/destino do tipo conta para ver o saldo." /> : (
+          <div className="tabela-rolagem">
+            <table className="tabela">
+              <thead><tr><th>Conta</th><th className="direita">Entradas</th><th className="direita">Saídas</th><th className="direita">Saldo</th></tr></thead>
+              <tbody>
+                {r.contas.map((c) => (
+                  <tr key={c.id}>
+                    <td>{c.nome}</td>
+                    <td className="direita dinheiro entrada">{moeda(c.entradas)}</td>
+                    <td className="direita dinheiro saida">{moeda(c.saidas)}</td>
+                    <td className="direita dinheiro">{sinal(c.saldo)}</td>
+                  </tr>
+                ))}
+                <tr>
+                  <td style={{ fontWeight: 600 }}>Total</td>
+                  <td className="direita dinheiro">{moeda(r.totalContas.entradas)}</td>
+                  <td className="direita dinheiro">{moeda(r.totalContas.saidas)}</td>
+                  <td className="direita dinheiro">{sinal(r.totalContas.saldo)}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        )}
+      </section>
     </>
   );
 }
