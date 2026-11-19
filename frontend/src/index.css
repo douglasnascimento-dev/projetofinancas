@@ -189,3 +189,8 @@ button, input, select { font: inherit; color: inherit; }
 /* Grade de duas colunas */
 .duas-colunas { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; align-items: start; }
 @media (max-width: 1100px) { .duas-colunas { grid-template-columns: 1fr; } }
+
+/* Relatórios: gráfico largo + tabela estreita */
+.relatorio-grade { display: grid; grid-template-columns: 1.8fr 1fr; gap: 16px; align-items: start; margin-bottom: 16px; }
+@media (max-width: 1100px) { .relatorio-grade { grid-template-columns: 1fr; } }
+.cabecalho-acoes .campo { min-width: 150px; }
