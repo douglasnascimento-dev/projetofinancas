@@ -27,4 +27,15 @@ router.get('/categorias', lerPeriodo, async (req, res, next) => {
   }
 });
 
+// GET /api/relatorios/fontes-destinos?inicio=&fim= → 200, 400
+// Entradas por fonte, saídas por destino e saldo (entradas − saídas) das fontes do tipo conta.
+router.get('/fontes-destinos', lerPeriodo, async (req, res, next) => {
+  try {
+    const relatorio = await Relatorio.porFonteDestino(req.usuarioId, req.periodo);
+    return res.status(200).json({ periodo: req.periodo, ...relatorio });
+  } catch (erro) {
+    return next(erro);
+  }
+});
+
 export default router;

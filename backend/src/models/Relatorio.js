@@ -45,6 +45,46 @@ class Relatorio {
     return { saidas: montar('saida'), entradas: montar('entrada') };
   }
 
+  // RF8 — entradas por fonte, saídas por destino e saldo das contas no período
+  async porFonteDestino(usuarioId, periodo) {
+    const { rows } = await query(
+      `SELECT f.id, f.nome, f.tipo,
+              COALESCE(SUM(l.valor) FILTER (WHERE l.tipo = 'entrada'), 0) AS entradas,
+              COALESCE(SUM(l.valor) FILTER (WHERE l.tipo = 'saida'), 0)   AS saidas
+         FROM fontes_destinos f
+         LEFT JOIN lancamentos l
+                ON l.fonte_destino_id = f.id
+               AND l.usuario_id = $1
+               AND l.data BETWEEN $2 AND $3
+        WHERE f.usuario_id = $1
+        GROUP BY f.id, f.nome, f.tipo
+        ORDER BY f.nome`,
+      [usuarioId, periodo.inicio, periodo.fim],
+    );
+
+    const linhas = rows.map((r) => ({
+      id: r.id, nome: r.nome, tipo: r.tipo, entradas: Number(r.entradas), saidas: Number(r.saidas),
+    }));
+    const soma = (lista, campo) => arredondar(lista.reduce((s, l) => s + l[campo], 0));
+    const porValor = (campo) => (a, b) => b[campo] - a[campo];
+
+    const fontes = linhas.filter((l) => l.entradas > 0).sort(porValor('entradas'))
+      .map(({ id, nome, tipo, entradas }) => ({ id, nome, tipo, total: entradas }));
+    const destinos = linhas.filter((l) => l.saidas > 0).sort(porValor('saidas'))
+      .map(({ id, nome, tipo, saidas }) => ({ id, nome, tipo, total: saidas }));
+    const contas = linhas.filter((l) => l.tipo === 'conta')
+      .map((l) => ({ id: l.id, nome: l.nome, entradas: l.entradas, saidas: l.saidas, saldo: arredondar(l.entradas - l.saidas) }));
+
+    return {
+      totalEntradas: soma(linhas, 'entradas'),
+      totalSaidas: soma(linhas, 'saidas'),
+      fontes,
+      destinos,
+      contas,
+      totalContas: { entradas: soma(contas, 'entradas'), saidas: soma(contas, 'saidas'), saldo: soma(contas, 'saldo') },
+    };
+  }
+
 }
 
 export default new Relatorio();
