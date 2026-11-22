@@ -11,8 +11,15 @@ const arredondar = (n) => Math.round(n * 100) / 100;
 
 class Fatura {
 
+  // Resposta da rota: sem a lista interna de parcelas a vencer
+  async listar(usuarioId, opcoes) {
+    const cartoes = await this.calcular(usuarioId, opcoes);
+    return cartoes.map(({ aVencer: _a, ...c }) => c);
+  }
+
   // meses: quantas faturas previstas mostrar além da aberta; hoje: 'AAAA-MM-DD'
-  async listar(usuarioId, { meses = 3, hoje = iso(new Date()) } = {}) {
+  // Também devolve aVencer (parcelas cuja fatura ainda não venceu), usado pela saúde financeira.
+  async calcular(usuarioId, { meses = 3, hoje = iso(new Date()) } = {}) {
     const { rows: cartoes } = await query(
       `SELECT id, nome, dia_fechamento, dia_vencimento, limite
          FROM fontes_destinos
@@ -57,7 +64,8 @@ class Fatura {
         }));
 
       // Limite comprometido: todas as parcelas cuja fatura ainda não venceu
-      const utilizado = arredondar(itens.filter((i) => i.vencimento >= hoje).reduce((s, i) => s + i.valor, 0));
+      const aVencer = itens.filter((i) => i.vencimento >= hoje);
+      const utilizado = arredondar(aVencer.reduce((s, i) => s + i.valor, 0));
 
       // Fatura aberta + as próximas `meses` faturas previstas
       const aberta = faturaAberta(cartao, hoje).referencia;
@@ -81,6 +89,7 @@ class Fatura {
         limiteUtilizado: utilizado,
         limiteDisponivel: arredondar(limite - utilizado),
         faturas,
+        aVencer: aVencer.map((i) => ({ valor: i.valor, referencia: i.referencia, totalParcelas: i.totalParcelas })),
       };
     });
   }
