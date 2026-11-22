@@ -199,3 +199,9 @@ button, input, select { font: inherit; color: inherit; }
 .abas { display: flex; gap: 24px; border-bottom: 1px solid var(--border); margin-bottom: 20px; overflow-x: auto; }
 .abas button { border: 0; background: none; padding: 10px 0; margin-bottom: -1px; cursor: pointer; font: 500 14px/20px var(--font); color: var(--text-muted); border-bottom: 2px solid transparent; white-space: nowrap; }
 .abas button.ativa { color: var(--brand); border-bottom-color: var(--brand); }
+
+/* Faturas: cartões dos meses (aberta + previstas) */
+.faturas-meses { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 16px; }
+.fatura-mes { display: flex; flex-direction: column; gap: 8px; text-align: left; cursor: pointer; font: inherit; color: inherit; border: 1px solid var(--border); }
+.fatura-mes.selecionada { border: 2px solid var(--brand); }
+.fatura-mes-topo { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: 500; }

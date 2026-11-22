@@ -12,6 +12,7 @@ import { Lancamentos } from './components/Lancamentos';
 import { Categorias } from './components/Categorias';
 import { FontesDestinos } from './components/FontesDestinos';
 import { Relatorios } from './components/Relatorios';
+import { Faturas } from './components/Faturas';
 
 export default function App() {
   return (
@@ -28,7 +29,7 @@ export default function App() {
               <Route path="categorias" element={<Categorias />} />
               <Route path="fontes-destinos" element={<FontesDestinos />} />
               <Route path="relatorios" element={<Relatorios />} />
-              <Route path="faturas" element={<EmConstrucao titulo="Faturas" />} />
+              <Route path="faturas" element={<Faturas />} />
               <Route path="saude-financeira" element={<EmConstrucao titulo="Saúde financeira" />} />
             </Route>
           </Route>
