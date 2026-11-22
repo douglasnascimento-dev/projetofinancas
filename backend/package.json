@@ -9,6 +9,7 @@
     "start": "node src/server.js",
     "db:reset": "node database/reset.js",
     "seed": "node database/seed.js",
+    "checklist": "node database/checklist.js",
     "test": "node --test \"src/models/regras/*.test.js\""
   },
   "engines": {
