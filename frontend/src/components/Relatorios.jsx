@@ -1,7 +1,7 @@
 // src/components/Relatorios.jsx
 // Relatórios do período: por categoria (RF7) e por fonte/destino (RF8). Os totais vêm calculados da API.
 import { useState } from 'react';
-import { Bar, BarChart, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
+import { Bar, BarChart, LabelList, Legend, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts';
 import { api } from '../services/api';
 import { data, hoje, moeda, nomeDoMes, periodoDoMes } from '../services/formatadores';
 import { useBuscar } from './useBuscar';
@@ -93,12 +93,14 @@ function RelatorioCategorias({ r }) {
           {comGasto.length === 0 ? <Vazio titulo="Nenhuma saída no período" /> : (
             <div style={{ width: '100%', height: Math.max(180, comGasto.length * 52) }}>
               <ResponsiveContainer>
-                <BarChart data={comGasto} layout="vertical" margin={{ left: 8, right: 16 }} barGap={2}>
+                <BarChart data={comGasto} layout="vertical" margin={{ left: 8, right: 100 }} barGap={2}>
                   <XAxis type="number" hide />
                   <YAxis type="category" dataKey="nome" width={110} tickLine={false} axisLine={false} />
                   <Tooltip formatter={(v) => moeda(v)} cursor={{ fill: '#EEF1F5' }} />
                   <Legend verticalAlign="top" align="right" iconType="circle" height={28} />
-                  <Bar dataKey="total" name={atual} fill={COR_ATUAL} radius={[0, 4, 4, 0]} barSize={10} />
+                  <Bar dataKey="total" name={atual} fill={COR_ATUAL} radius={[0, 4, 4, 0]} barSize={10}>
+                    <LabelList dataKey="total" position="right" formatter={(v) => moeda(v)} style={{ fontWeight: 600, fill: '#0F172A' }} />
+                  </Bar>
                   <Bar dataKey="periodoAnterior" name={anterior} fill={COR_ANTERIOR} radius={[0, 4, 4, 0]} barSize={6} />
                 </BarChart>
               </ResponsiveContainer>
@@ -164,11 +166,13 @@ function BarrasHorizontais({ itens, cor }) {
   return (
     <div style={{ width: '100%', height: Math.max(120, itens.length * 40) }}>
       <ResponsiveContainer>
-        <BarChart data={itens} layout="vertical" margin={{ left: 8, right: 16 }}>
+        <BarChart data={itens} layout="vertical" margin={{ left: 8, right: 100 }}>
           <XAxis type="number" hide />
           <YAxis type="category" dataKey="nome" width={130} tickLine={false} axisLine={false} />
           <Tooltip formatter={(v) => moeda(v)} cursor={{ fill: '#EEF1F5' }} />
-          <Bar dataKey="total" name="Total" fill={cor} radius={[0, 4, 4, 0]} barSize={10} />
+          <Bar dataKey="total" name="Total" fill={cor} radius={[0, 4, 4, 0]} barSize={10}>
+            <LabelList dataKey="total" position="right" formatter={(v) => moeda(v)} style={{ fontWeight: 600, fill: '#0F172A' }} />
+          </Bar>
         </BarChart>
       </ResponsiveContainer>
     </div>
