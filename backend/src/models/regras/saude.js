@@ -29,7 +29,10 @@ const nomeMes = (ref) => `${NOMES[Number(ref.slice(5, 7)) - 1]} de ${ref.slice(0
 // linhas: [{ mes: 'AAAA-MM', tipo, categoria, cartao: bool, parcelado: bool, total }]
 // mesesBase: meses completos usados nas médias (ex.: os 3 anteriores ao atual); mesAtual: 'AAAA-MM'
 // cartoes: saída de Fatura.calcular; reserva: saldo das contas marcadas como reserva
-export function calcularSaude({ linhas, mesesBase, mesAtual, cartoes, reserva, mesesProjecao = 6 }) {
+export function calcularSaude({ linhas, mesesBase: mesesPedidos, mesAtual, cartoes, reserva, mesesProjecao = 6 }) {
+  // Meses antes do primeiro lançamento do usuário não entram nas médias (usuário novo não tem renda "zero")
+  const comDados = mesesPedidos.filter((m) => linhas.some((l) => l.mes <= m));
+  const mesesBase = comDados.length > 0 ? comDados : mesesPedidos;
   const doMes = (mes, filtro) => soma(linhas.filter((l) => l.mes === mes && filtro(l)), (l) => l.total);
   const n = mesesBase.length;
 

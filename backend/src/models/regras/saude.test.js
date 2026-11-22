@@ -64,3 +64,9 @@ test('gera dicas a partir dos dados', () => {
   assert.match(textos, /Alimentação estão 50,0% acima/);
   assert.match(textos, /reserva cobre 1,5/);
 });
+
+test('meses antes do primeiro lançamento não entram nas médias', () => {
+  const r2 = calcularSaude({ linhas, mesesBase: ['2026-07', ...mesesBase], mesAtual: '2026-11', cartoes, reserva: 6000 });
+  assert.deepEqual(r2.mesesBase, mesesBase);
+  assert.equal(r2.indicadores.rendaMedia, 5000);
+});
