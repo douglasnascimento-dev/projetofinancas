@@ -205,3 +205,16 @@ button, input, select { font: inherit; color: inherit; }
 .fatura-mes { display: flex; flex-direction: column; gap: 8px; text-align: left; cursor: pointer; font: inherit; color: inherit; border: 1px solid var(--border); }
 .fatura-mes.selecionada { border: 2px solid var(--brand); }
 .fatura-mes-topo { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: 500; }
+
+/* Saúde financeira */
+.alerta-texto { color: var(--warning); }
+.kpis-4 { margin-bottom: 16px; }
+.regra-linha { margin-bottom: 16px; }
+.regra-topo { display: flex; justify-content: space-between; margin-bottom: 6px; }
+.regra-barra { position: relative; height: 8px; background: var(--bg-subtle); border-radius: var(--radius-full); }
+.regra-barra span { display: block; height: 100%; border-radius: var(--radius-full); }
+.regra-barra i { position: absolute; top: -3px; width: 2px; height: 14px; background: var(--text); }
+.dicas { list-style: none; margin: 0; padding: 0; }
+.dicas li { display: flex; gap: 12px; align-items: baseline; padding: 12px 0; border-bottom: 1px solid var(--border); }
+.dicas li:last-child { border-bottom: 0; }
+.dicas .selo { flex: none; }
